@@ -12,9 +12,10 @@ class Bullet {
 
 public:
 	CircleShape shape;
+	Vector2f maxVelocity;
 	Vector2f CurrentVelocity;
 	float maxSpeed;
-	Bullet(float radius = 3.f) :CurrentVelocity(10.f, 10.f), maxSpeed(15.f) {
+	Bullet(float radius = 3.f) :CurrentVelocity(maxVelocity.x, maxVelocity.y), maxSpeed(15.f) {
 		this->shape.setRadius(radius);
 		this->shape.setFillColor(Color::Green);
 	}
@@ -125,7 +126,7 @@ int main()
 
 		if (Mouse::isButtonPressed(Mouse::Left)) {
 			b1.shape.setPosition(ucak.getPosition());
-			//b1.CurrentVelocity *= 5.f;
+			
 			bullets.push_back(Bullet(b1));
 			
 			
@@ -133,10 +134,12 @@ int main()
 			//getpos = b1.shape.getPosition().x;
 			//std::cout << getpos;
 		}
-
+		
 		for (size_t i = 0; i < bullets.size(); i++)
 		{
-			bullets[i].shape.move(bullets[i].CurrentVelocity);
+			b1.maxVelocity = Vector2f(10.f, 0.f);
+			bullets[i].shape.move(bullets[i].maxVelocity);
+			//b1.maxVelocity.x *= 2.f;
 			if (bullets[i].shape.getGlobalBounds().intersects(dusman.getGlobalBounds())) {
 				puan += 10;
 				ssEkran.str("");
@@ -144,6 +147,7 @@ int main()
 				yazi.setString(ssEkran.str());
 				std::cout << puan << "\n";
 				dusman.setPosition(sf::Vector2f(x, y));
+				
 			}
 			if (bullets[i].shape.getGlobalBounds().intersects(meyve.getGlobalBounds())) {
 				puan += 10;
@@ -152,6 +156,7 @@ int main()
 				yazi.setString(ssEkran.str());
 				std::cout << puan << "\n";
 				meyve.setPosition(Vector2f(x, y));
+				
 			}
 			
 		}
