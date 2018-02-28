@@ -3,11 +3,24 @@
 #include <time.h>
 #include <sstream>
 
-
 using namespace sf;
 
 const int W = 1200;
 const int H = 700;
+
+class Bullet {
+
+public:
+	CircleShape shape;
+	Vector2f CurrentVelocity;
+	float maxSpeed;
+	Bullet(float radius = 3.f) :CurrentVelocity(10.f, 10.f), maxSpeed(15.f) {
+		this->shape.setRadius(radius);
+		this->shape.setFillColor(Color::Green);
+	}
+};
+
+
 
 int main()
 {
@@ -18,7 +31,7 @@ int main()
 	float a = 10.0f,b;
 	float hiz = 0.01f;
 	float maxHiz = 10.0f;
-	RenderWindow app(VideoMode(W, H), "Asteroids!");
+	RenderWindow app(VideoMode(W, H), "Fruit Hunter!");
 	app.setFramerateLimit(60);
 
 	Text yazi;
@@ -38,6 +51,8 @@ int main()
 	t1.setSmooth(true);
 	t2.setSmooth(true);
 
+	int getpos;
+
 	Sprite background(t2);
 	Sprite ucak(t1);
 	Sprite dusman(t3);
@@ -49,6 +64,12 @@ int main()
 	meyve.setPosition(780, 350);
 	meyve.setScale(0.5f, 0.5f);
 
+	Bullet b1;
+
+	std::vector<Bullet>bullets;
+	bullets.push_back(Bullet(b1));
+
+
 
 	/////main loop/////
 	while (app.isOpen())
@@ -57,9 +78,10 @@ int main()
 		while (app.pollEvent(event))
 		{
 			if (event.type == Event::Closed)
-				app.close();			
+				app.close();	
 		}
-
+		if (Keyboard::isKeyPressed(Keyboard::Escape))
+			app.close();
 		if (Keyboard::isKeyPressed(Keyboard::Right)|| Keyboard::isKeyPressed(Keyboard::D)) {
 			ucak.move(a, 0.0f);
 		}
@@ -100,6 +122,42 @@ int main()
 			std::cout << puan << "\n";
 			meyve.setPosition(Vector2f(x, y));
 		}
+
+		if (Mouse::isButtonPressed(Mouse::Left)) {
+			b1.shape.setPosition(ucak.getPosition());
+			//b1.CurrentVelocity *= 5.f;
+			bullets.push_back(Bullet(b1));
+			
+			
+			std::cout << "mouse tiklandi\n";
+			//getpos = b1.shape.getPosition().x;
+			//std::cout << getpos;
+		}
+
+		for (size_t i = 0; i < bullets.size(); i++)
+		{
+			bullets[i].shape.move(bullets[i].CurrentVelocity);
+			if (bullets[i].shape.getGlobalBounds().intersects(dusman.getGlobalBounds())) {
+				puan += 10;
+				ssEkran.str("");
+				ssEkran << "Puan : " << puan;
+				yazi.setString(ssEkran.str());
+				std::cout << puan << "\n";
+				dusman.setPosition(sf::Vector2f(x, y));
+			}
+			if (bullets[i].shape.getGlobalBounds().intersects(meyve.getGlobalBounds())) {
+				puan += 10;
+				ssEkran.str("");
+				ssEkran << "Puan : " << puan;
+				yazi.setString(ssEkran.str());
+				std::cout << puan << "\n";
+				meyve.setPosition(Vector2f(x, y));
+			}
+			
+		}
+		
+
+
 		x = rand() % W-40;
 		y = rand() % H-40;
 		
@@ -112,10 +170,17 @@ int main()
 
 
 
-
-
 		app.clear();
+
+
+		
+		
 		app.draw(background);
+		for (size_t i = 0; i < bullets.size(); i++)
+		{
+			app.draw(bullets[i].shape);
+		}
+		
 		app.draw(dusman);
 		app.draw(meyve);
 		app.draw(ucak);		
